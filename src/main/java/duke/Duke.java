@@ -2,17 +2,16 @@ package duke;
 
 import java.util.Scanner;
 
-/**
- * Duke main program: reads commands, delegates to TaskList/Parser/Ui.
- */
 public class Duke {
-    private static final String BOT_NAME = "SimBot"; // <- customize me!
+    private static final String BOT_NAME = "SimBot";
     private final Ui ui;
+    private final Storage storage;
     private final TaskList tasks;
 
     public Duke() {
         this.ui = new Ui(BOT_NAME);
-        this.tasks = new TaskList();
+        this.storage = new Storage();
+        this.tasks = storage.load();
     }
 
     public static void main(String[] args) {
@@ -23,7 +22,7 @@ public class Duke {
         ui.showWelcome();
         try (Scanner sc = new Scanner(System.in)) {
             while (true) {
-                String line = sc.nextLine().trim();
+                String line = sc.hasNextLine() ? sc.nextLine().trim() : "bye";
                 if (line.isEmpty()) {
                     ui.showError("OOPS!!! Empty command.");
                     continue;
@@ -36,21 +35,34 @@ public class Duke {
                     case LIST:
                         ui.showList(tasks);
                         break;
-                    case TODO:
+                    case TODO: {
                         Task t = new Todo(pc.args());
                         tasks.add(t);
+                        storage.save(tasks);
                         ui.showAdded(t, tasks.size());
                         break;
+                    }
                     case DEADLINE: {
                         String[] parts = Parser.splitOnce(pc.args(), "/by");
                         if (parts[0].isBlank() || parts[1].isBlank()) {
                             throw new DukeException("OOPS!!! Deadline requires description and /by time.");
                         }
-                        Task d = new Deadline(parts[0].trim(), parts[1].trim());
+                        String desc = parts[0].trim();
+                        String raw = parts[1].trim();
+
+                        Task d;
+                        try {
+                            d = new Deadline(desc, java.time.LocalDate.parse(raw));
+                        } catch (Exception e) {
+                            d = new Deadline(desc, raw);
+                        }
+
                         tasks.add(d);
+                        storage.save(tasks);
                         ui.showAdded(d, tasks.size());
                         break;
                     }
+
                     case EVENT: {
                         String[] parts = Parser.splitTwo(pc.args(), "/from", "/to");
                         if (parts[0].isBlank() || parts[1].isBlank() || parts[2].isBlank()) {
@@ -58,29 +70,34 @@ public class Duke {
                         }
                         Task e = new Event(parts[0].trim(), parts[1].trim(), parts[2].trim());
                         tasks.add(e);
+                        storage.save(tasks);
                         ui.showAdded(e, tasks.size());
                         break;
                     }
-                    case MARK:
+                    case MARK: {
+                        int idx = Parser.requireIndex(pc.args(), tasks.size());
+                        Task target = tasks.get(idx);
+                        target.mark();
+                        storage.save(tasks);
+                        ui.showMarked(target, true);
+                        break;
+                    }
                     case UNMARK: {
                         int idx = Parser.requireIndex(pc.args(), tasks.size());
                         Task target = tasks.get(idx);
-                        if (pc.type() == CommandType.MARK) {
-                            target.mark();
-                            ui.showMarked(target, true);
-                        } else {
-                            target.unmark();
-                            ui.showMarked(target, false);
-                        }
+                        target.unmark();
+                        storage.save(tasks);
+                        ui.showMarked(target, false);
                         break;
                     }
                     case DELETE: {
                         int idx = Parser.requireIndex(pc.args(), tasks.size());
                         Task removed = tasks.remove(idx);
+                        storage.save(tasks);
                         ui.showDeleted(removed, tasks.size());
                         break;
                     }
-                    case ECHO: // Level-1 behavior (only used before Level-5 error handling kicks in)
+                    case ECHO:
                         ui.showEcho(pc.args());
                         break;
                     default:
@@ -89,7 +106,6 @@ public class Duke {
             }
         } catch (DukeException e) {
             ui.showError(e.getMessage());
-            // Keep running after error (optional). For simplicity, exit on fatal parse issues:
         }
     }
 }
