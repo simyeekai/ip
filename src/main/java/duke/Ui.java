@@ -60,6 +60,19 @@ public class Ui {
         }
     }
 
+    public void showMatches(java.util.List<Task> matches) {
+        if (matches.isEmpty()) {
+            box("No matching tasks found.");
+            return;
+        }
+        StringBuilder sb = new StringBuilder("Here are the matching tasks in your list:");
+        for (int i = 0; i < matches.size(); i++) {
+            sb.append("\n ").append(i + 1).append(".").append(matches.get(i));
+        }
+        box(sb.toString());
+    }
+
+
     public void showError(String msg) {
         box(msg);
     }

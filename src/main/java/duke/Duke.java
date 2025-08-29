@@ -1,4 +1,4 @@
-package duke; //packaged
+package duke;
 
 import java.util.Scanner;
 
@@ -95,6 +95,12 @@ public class Duke {
                         Task removed = tasks.remove(idx);
                         storage.save(tasks);
                         ui.showDeleted(removed, tasks.size());
+                        break;
+                    }
+                    case FIND: {
+                        String keyword = pc.args().trim();
+                        java.util.List<Task> matches = tasks.find(keyword);
+                        ui.showMatches(matches);
                         break;
                     }
                     case ECHO:

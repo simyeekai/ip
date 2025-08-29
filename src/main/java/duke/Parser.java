@@ -29,6 +29,9 @@ public class Parser {
             case "delete":
                 if (args.isBlank()) throw new DukeException("OOPS!!! Provide an index to delete.");
                 return new ParsedCommand(CommandType.DELETE, args);
+            case "find":
+                if (args.isBlank()) throw new DukeException("OOPS!!! Provide a keyword to find.");
+                return new ParsedCommand(CommandType.FIND, args);
             default:
                 // For Level-1 echo: treat unknown token as echo of the whole line.
                 // After Level-5 this path will throw instead (we do that in Duke switch).
