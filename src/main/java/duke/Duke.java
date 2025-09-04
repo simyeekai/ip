@@ -1,4 +1,4 @@
-package duke; //update 5
+package duke;
 
 import java.util.Scanner;
 
@@ -113,5 +113,12 @@ public class Duke {
         } catch (DukeException e) {
             ui.showError(e.getMessage());
         }
+    }
+
+    /**
+     * Generates a response for the user's chat message.
+     */
+    public String getResponse(String input) {
+        return "Duke heard: " + input;
     }
 }
