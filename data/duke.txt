@@ -1,0 +1,6 @@
+T | 0 | read
+T | 0 | eat
+T | 0 | read
+T | 0 | eat
+T | 0 | eat
+T | 0 | read
