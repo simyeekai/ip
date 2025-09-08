@@ -113,6 +113,9 @@ public class Duke {
                 case ECHO:
                     return pc.args();
 
+                case HELP:
+                    return getHelpText();
+
                 default:
                     throw new DukeException("OOPS!! I'm sorry, but I don't know what that means :(");
             }
@@ -154,4 +157,33 @@ public class Duke {
         }
         return sb.toString();
     }
+
+    private String getHelpText() {
+        return String.join("\n",
+                "SimBot Help",
+                "-------------------------",
+                "General:",
+                "  help                    Show this help",
+                "  bye                     Exit the app",
+                "",
+                "Viewing & Searching:",
+                "  list                    Show all tasks",
+                "  find <keyword>          Find tasks containing keyword",
+                "",
+                "Adding:",
+                "  todo <desc>             Add a todo",
+                "  deadline <desc> /by <yyyy-mm-dd|free text>",
+                "  event <desc> /from <start> /to <end>",
+                "",
+                "Updating:",
+                "  mark <index>            Mark task done",
+                "  unmark <index>          Mark task not done",
+                "  delete <index>          Delete task",
+                "",
+                "Notes:",
+                "  • Indices refer to positions shown in 'list' (starting from 1).",
+                "  • Dates accept ISO format (yyyy-mm-dd) or free text for display."
+        );
+    }
+
 }

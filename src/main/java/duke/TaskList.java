@@ -24,5 +24,5 @@ public class TaskList {
         return tasks.stream()
                 .filter(t -> t.toString().toLowerCase().contains(k))
                 .toList();
-    }:
+    }
 }
