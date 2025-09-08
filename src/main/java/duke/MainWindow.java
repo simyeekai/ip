@@ -1,5 +1,6 @@
 package duke;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -7,18 +8,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+
 /**
  * Controller for the main GUI.
  */
 public class MainWindow extends AnchorPane {
-    @FXML
-    private ScrollPane scrollPane;
-    @FXML
-    private VBox dialogContainer;
-    @FXML
-    private TextField userInput;
-    @FXML
-    private Button sendButton;
+    @FXML private ScrollPane scrollPane;
+    @FXML private VBox dialogContainer;
+    @FXML private TextField userInput;
+    @FXML private Button sendButton;
 
     private Duke duke;
 
@@ -33,11 +31,15 @@ public class MainWindow extends AnchorPane {
     /** Injects the Duke instance */
     public void setDuke(Duke d) {
         duke = d;
+        // Optional greeting on startup
+        dialogContainer.getChildren().add(
+                DialogBox.getDukeDialog("Hello! I'm SimBot\nWhat can I do for you?", dukeImage)
+        );
     }
 
     /**
-     * Creates two dialog boxes, one echoing user input and the other containing Duke's reply and then appends them to
-     * the dialog container. Clears the user input after processing.
+     * Creates two dialog boxes, one echoing user input and the other containing Duke's reply,
+     * then appends them to the dialog container. Clears the user input after processing.
      */
     @FXML
     private void handleUserInput() {
@@ -48,5 +50,13 @@ public class MainWindow extends AnchorPane {
                 DialogBox.getDukeDialog(response, dukeImage)
         );
         userInput.clear();
+
+        if (duke.shouldExit()) {
+            // Show the goodbye response for a moment before exiting
+            new Thread(() -> {
+                try { Thread.sleep(250); } catch (InterruptedException ignored) {}
+                Platform.runLater(Platform::exit);
+            }).start();
+        }
     }
 }

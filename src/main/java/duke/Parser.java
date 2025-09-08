@@ -63,12 +63,17 @@ public class Parser {
 
     /** Parses a 1-based index and bounds-checks against size. */
     public static int requireIndex(String arg, int size) {
-        try {
-            int idx = Integer.parseInt(arg.trim());
-            if (idx < 1 || idx > size) throw new DukeException("OOPS!!! Index out of range.");
-            return idx;
-        } catch (NumberFormatException e) {
-            throw new DukeException("OOPS!!! That's not a valid index.");
+        assert size >= 0 : "size must be non-negative";
+        String s = arg == null ? "" : arg.trim();
+        if (s.isEmpty()) throw new DukeException("OOPS!!! Please provide an index.");
+        int oneBased;
+        try { oneBased = Integer.parseInt(s); }
+        catch (NumberFormatException e) { throw new DukeException("OOPS!!! \"" + s + "\" is not a number."); }
+        if (oneBased < 1 || oneBased > size) {
+            throw new DukeException("OOPS!!! Index must be between 1 and " + size + ".");
         }
+        int zero = oneBased - 1;
+        assert zero >= 0 && zero < size : "calculated index out of bounds";
+        return zero;
     }
 }
