@@ -15,13 +15,14 @@ public class TaskList {
     public Task getZero(int zeroIdx) { return tasks.get(zeroIdx); }
 
     public List<Task> find(String keyword) {
-        String k = keyword.toLowerCase(Locale.ROOT).trim();
-        List<Task> out = new ArrayList<>();
-        for (Task t : tasks) {
-            if (t.description().toLowerCase(Locale.ROOT).contains(k)) {
-                out.add(t);
-            }
+        String q = keyword == null ? "" : keyword.trim();
+        if (q.isEmpty()) {
+            return List.of();
         }
-        return out;
-    }
+        String k = q.toLowerCase();
+
+        return tasks.stream()
+                .filter(t -> t.toString().toLowerCase().contains(k))
+                .toList();
+    }:
 }
