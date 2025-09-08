@@ -1,4 +1,4 @@
-package duke;
+package duke; //improve code quality
 
 import java.util.Scanner;
 
