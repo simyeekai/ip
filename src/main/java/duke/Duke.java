@@ -1,9 +1,12 @@
 package duke; //improve code quality
 
-import java.util.Scanner;
+import java.util.List;
 
 public class Duke {
     private static final String BOT_NAME = "SimBot";
+    private boolean shouldExit = false;
+
+    // Kept for compatibility if you still print from Ui elsewhere
     private final Ui ui;
     private final Storage storage;
     private final TaskList tasks;
@@ -14,111 +17,141 @@ public class Duke {
         this.tasks = storage.load();
     }
 
-    public static void main(String[] args) {
-        new Duke().run();
-    }
-
-    private void run() {
-        ui.showWelcome();
-        try (Scanner sc = new Scanner(System.in)) {
-            while (true) {
-                String line = sc.hasNextLine() ? sc.nextLine().trim() : "bye";
-                if (line.isEmpty()) {
-                    ui.showError("OOPS!!! Empty command.");
-                    continue;
-                }
-                ParsedCommand pc = Parser.parse(line);
-                switch (pc.type()) {
-                    case BYE:
-                        ui.showGoodbye();
-                        return;
-                    case LIST:
-                        ui.showList(tasks);
-                        break;
-                    case TODO: {
-                        Task t = new Todo(pc.args());
-                        tasks.add(t);
-                        storage.save(tasks);
-                        ui.showAdded(t, tasks.size());
-                        break;
-                    }
-                    case DEADLINE: {
-                        String[] parts = Parser.splitOnce(pc.args(), "/by");
-                        if (parts[0].isBlank() || parts[1].isBlank()) {
-                            throw new DukeException("OOPS!!! Deadline requires description and /by time.");
-                        }
-                        String desc = parts[0].trim();
-                        String raw = parts[1].trim();
-
-                        Task d;
-                        try {
-                            d = new Deadline(desc, java.time.LocalDate.parse(raw));
-                        } catch (Exception e) {
-                            d = new Deadline(desc, raw);
-                        }
-
-                        tasks.add(d);
-                        storage.save(tasks);
-                        ui.showAdded(d, tasks.size());
-                        break;
-                    }
-
-                    case EVENT: {
-                        String[] parts = Parser.splitTwo(pc.args(), "/from", "/to");
-                        if (parts[0].isBlank() || parts[1].isBlank() || parts[2].isBlank()) {
-                            throw new DukeException("OOPS!!! Event requires description, /from and /to.");
-                        }
-                        Task e = new Event(parts[0].trim(), parts[1].trim(), parts[2].trim());
-                        tasks.add(e);
-                        storage.save(tasks);
-                        ui.showAdded(e, tasks.size());
-                        break;
-                    }
-                    case MARK: {
-                        int idx = Parser.requireIndex(pc.args(), tasks.size());
-                        Task target = tasks.get(idx);
-                        target.mark();
-                        storage.save(tasks);
-                        ui.showMarked(target, true);
-                        break;
-                    }
-                    case UNMARK: {
-                        int idx = Parser.requireIndex(pc.args(), tasks.size());
-                        Task target = tasks.get(idx);
-                        target.unmark();
-                        storage.save(tasks);
-                        ui.showMarked(target, false);
-                        break;
-                    }
-                    case DELETE: {
-                        int idx = Parser.requireIndex(pc.args(), tasks.size());
-                        Task removed = tasks.remove(idx);
-                        storage.save(tasks);
-                        ui.showDeleted(removed, tasks.size());
-                        break;
-                    }
-                    case FIND: {
-                        String keyword = pc.args().trim();
-                        java.util.List<Task> matches = tasks.find(keyword);
-                        ui.showMatches(matches);
-                        break;
-                    }
-                    case ECHO:
-                        ui.showEcho(pc.args());
-                        break;
-                    default:
-                        throw new DukeException("OOPS!! I'm sorry, but I don't know what that means :(");
-                }
-            }
-        } catch (DukeException e) {
-            ui.showError(e.getMessage());
-        }
+    /** Whether the app should exit (after "bye"). */
+    public boolean shouldExit() {
+        return shouldExit;
     }
 
     /**
-     * Generates a response for the user's chat message.
+     * GUI-friendly single-turn handler.
+     * Parses a single input, mutates state, and returns a response String.
      */
     public String getResponse(String input) {
-        return "Duke heard: " + input;
+        try {
+            if (input == null || input.trim().isEmpty()) {
+                throw new DukeException("OOPS!!! Empty command.");
+            }
+
+            ParsedCommand pc = Parser.parse(input.trim());
+
+            switch (pc.type()) {
+                case BYE:
+                    shouldExit = true;
+                    return "Bye. Hope to see you again soon!";
+
+                case LIST:
+                    return formatList(tasks);
+
+                case TODO: {
+                    Task t = new Todo(pc.args());
+                    tasks.add(t);
+                    storage.save(tasks);
+                    return formatAdded(t, tasks.size());
+                }
+
+                case DEADLINE: {
+                    String[] parts = Parser.splitOnce(pc.args(), "/by");
+                    if (parts[0].isBlank() || parts[1].isBlank()) {
+                        throw new DukeException("OOPS!!! Deadline requires description and /by time.");
+                    }
+                    String desc = parts[0].trim();
+                    String raw = parts[1].trim();
+
+                    Task d;
+                    try {
+                        d = new Deadline(desc, java.time.LocalDate.parse(raw));
+                    } catch (Exception e) {
+                        d = new Deadline(desc, raw);
+                    }
+
+                    tasks.add(d);
+                    storage.save(tasks);
+                    return formatAdded(d, tasks.size());
+                }
+
+                case EVENT: {
+                    String[] parts = Parser.splitTwo(pc.args(), "/from", "/to");
+                    if (parts[0].isBlank() || parts[1].isBlank() || parts[2].isBlank()) {
+                        throw new DukeException("OOPS!!! Event requires description, /from and /to.");
+                    }
+                    Task e = new Event(parts[0].trim(), parts[1].trim(), parts[2].trim());
+                    tasks.add(e);
+                    storage.save(tasks);
+                    return formatAdded(e, tasks.size());
+                }
+
+                case MARK: {
+                    int idx = Parser.requireIndex(pc.args(), tasks.size());
+                    Task target = tasks.get(idx);
+                    target.mark();
+                    storage.save(tasks);
+                    return "Nice! I've marked this task as done:\n  " + target;
+                }
+
+                case UNMARK: {
+                    int idx = Parser.requireIndex(pc.args(), tasks.size());
+                    Task target = tasks.get(idx);
+                    target.unmark();
+                    storage.save(tasks);
+                    return "OK, I've marked this task as not done yet:\n  " + target;
+                }
+
+                case DELETE: {
+                    int idx = Parser.requireIndex(pc.args(), tasks.size());
+                    Task removed = tasks.remove(idx);
+                    storage.save(tasks);
+                    return "Noted. I've removed this task:\n  " + removed
+                            + "\nNow you have " + tasks.size() + " tasks in the list.";
+                }
+
+                case FIND: {
+                    String keyword = pc.args().trim();
+                    List<Task> matches = tasks.find(keyword);
+                    return formatMatches(matches, keyword);
+                }
+
+                case ECHO:
+                    return pc.args();
+
+                default:
+                    throw new DukeException("OOPS!! I'm sorry, but I don't know what that means :(");
+            }
+        } catch (DukeException e) {
+            return e.getMessage();
+        } catch (Exception e) {
+            return "OOPS!!! " + e.getMessage();
+        }
+    }
+
+    /* ---------------- Formatting helpers ---------------- */
+
+    private String formatList(TaskList tasks) {
+        if (tasks.size() == 0) {
+            return "Your list is empty.";
+        }
+        StringBuilder sb = new StringBuilder("Here are the tasks in your list:");
+        for (int i = 0; i < tasks.size(); i++) {
+            sb.append("\n").append(i + 1).append(". ").append(tasks.get(i));
+        }
+        return sb.toString();
+    }
+
+    private String formatAdded(Task t, int newSize) {
+        return "Got it. I've added this task:\n  " + t
+                + "\nNow you have " + newSize + " tasks in the list.";
+    }
+
+    private String formatMatches(List<Task> matches, String keyword) {
+        if (keyword.isEmpty()) {
+            return "Please provide a keyword to find.";
+        }
+        if (matches.isEmpty()) {
+            return "No matching tasks found for \"" + keyword + "\".";
+        }
+        StringBuilder sb = new StringBuilder("Here are the matching tasks in your list:");
+        for (int i = 0; i < matches.size(); i++) {
+            sb.append("\n").append(i + 1).append(". ").append(matches.get(i));
+        }
+        return sb.toString();
     }
 }
