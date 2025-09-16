@@ -1,4 +1,4 @@
-package duke;
+package luke;
 
 public class Event extends Task {
     private final String from;
@@ -7,7 +7,7 @@ public class Event extends Task {
     public Event(String description, String from, String to) {
         super(description);
         if (from == null || from.isBlank() || to == null || to.isBlank()) {
-            throw new DukeException("OOPS!!! Event must have /from and /to.");
+            throw new LukeException("OOPS!!! Event must have /from and /to.");
         }
         this.from = from;
         this.to = to;

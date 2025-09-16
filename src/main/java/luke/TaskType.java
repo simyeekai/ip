@@ -1,4 +1,4 @@
-package duke;
+package luke;
 
 public enum TaskType {
     TODO("T"), DEADLINE("D"), EVENT("E");

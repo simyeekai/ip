@@ -1,4 +1,4 @@
-package duke;
+package luke;
 
 /** Parses user input into command + args. */
 public class Parser {
@@ -12,31 +12,31 @@ public class Parser {
             case "bye": return new ParsedCommand(CommandType.BYE, "");
             case "list": return new ParsedCommand(CommandType.LIST, "");
             case "todo":
-                if (args.isBlank()) throw new DukeException("OOPS!!! The description of a todo cannot be empty.");
+                if (args.isBlank()) throw new LukeException("OOPS!!! The description of a todo cannot be empty.");
                 return new ParsedCommand(CommandType.TODO, args);
             case "deadline":
-                if (args.isBlank()) throw new DukeException("OOPS!!! The description of a deadline cannot be empty.");
+                if (args.isBlank()) throw new LukeException("OOPS!!! The description of a deadline cannot be empty.");
                 return new ParsedCommand(CommandType.DEADLINE, args);
             case "event":
-                if (args.isBlank()) throw new DukeException("OOPS!!! The description of an event cannot be empty.");
+                if (args.isBlank()) throw new LukeException("OOPS!!! The description of an event cannot be empty.");
                 return new ParsedCommand(CommandType.EVENT, args);
             case "mark":
-                if (args.isBlank()) throw new DukeException("OOPS!!! Provide an index to mark.");
+                if (args.isBlank()) throw new LukeException("OOPS!!! Provide an index to mark.");
                 return new ParsedCommand(CommandType.MARK, args);
             case "unmark":
-                if (args.isBlank()) throw new DukeException("OOPS!!! Provide an index to unmark.");
+                if (args.isBlank()) throw new LukeException("OOPS!!! Provide an index to unmark.");
                 return new ParsedCommand(CommandType.UNMARK, args);
             case "delete":
-                if (args.isBlank()) throw new DukeException("OOPS!!! Provide an index to delete.");
+                if (args.isBlank()) throw new LukeException("OOPS!!! Provide an index to delete.");
                 return new ParsedCommand(CommandType.DELETE, args);
             case "find":
-                if (args.isBlank()) throw new DukeException("OOPS!!! Provide a keyword to find.");
+                if (args.isBlank()) throw new LukeException("OOPS!!! Provide a keyword to find.");
                 return new ParsedCommand(CommandType.FIND, args);
             case "help":
                 return new ParsedCommand(CommandType.HELP, args);
             default:
                 // For Level-1 echo: treat unknown token as echo of the whole line.
-                // After Level-5 this path will throw instead (we do that in Duke switch).
+                // After Level-5 this path will throw instead (we do that in Luke switch).
                 return new ParsedCommand(CommandType.UNKNOWN, line);
         }
     }
@@ -67,12 +67,12 @@ public class Parser {
     public static int requireIndex(String arg, int size) {
         assert size >= 0 : "size must be non-negative";
         String s = arg == null ? "" : arg.trim();
-        if (s.isEmpty()) throw new DukeException("OOPS!!! Please provide an index.");
+        if (s.isEmpty()) throw new LukeException("OOPS!!! Please provide an index.");
         int oneBased;
         try { oneBased = Integer.parseInt(s); }
-        catch (NumberFormatException e) { throw new DukeException("OOPS!!! \"" + s + "\" is not a number."); }
+        catch (NumberFormatException e) { throw new LukeException("OOPS!!! \"" + s + "\" is not a number."); }
         if (oneBased < 1 || oneBased > size) {
-            throw new DukeException("OOPS!!! Index must be between 1 and " + size + ".");
+            throw new LukeException("OOPS!!! Index must be between 1 and " + size + ".");
         }
         int zero = oneBased - 1;
         assert zero >= 0 && zero < size : "calculated index out of bounds";

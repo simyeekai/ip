@@ -1,4 +1,4 @@
-package duke;
+package luke;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -12,7 +12,7 @@ public class Storage {
     private final Path filePath;
 
     public Storage() {
-        this.filePath = Paths.get("data", "duke.txt");
+        this.filePath = Paths.get("data", "luke.txt");
     }
 
     public TaskList load() {

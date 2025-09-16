@@ -1,4 +1,4 @@
-package duke;
+package luke;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -18,40 +18,40 @@ public class MainWindow extends AnchorPane {
     @FXML private TextField userInput;
     @FXML private Button sendButton;
 
-    private Duke duke;
+    private Luke luke;
 
     private Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
-    private Image dukeImage = new Image(this.getClass().getResourceAsStream("/images/DaDuke.png"));
+    private Image lukeImage = new Image(this.getClass().getResourceAsStream("/images/DaLuke.png"));
 
     @FXML
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
     }
 
-    /** Injects the Duke instance */
-    public void setDuke(Duke d) {
-        duke = d;
+    /** Injects the Luke instance */
+    public void setLuke(Luke d) {
+        luke = d;
         // Optional greeting on startup
         dialogContainer.getChildren().add(
-                DialogBox.getDukeDialog("Hello! I'm SimBot\nWhat can I do for you?", dukeImage)
+                DialogBox.getLukeDialog("Hello! I'm SimBot\nWhat can I do for you?", lukeImage)
         );
     }
 
     /**
-     * Creates two dialog boxes, one echoing user input and the other containing Duke's reply,
+     * Creates two dialog boxes, one echoing user input and the other containing Luke's reply,
      * then appends them to the dialog container. Clears the user input after processing.
      */
     @FXML
     private void handleUserInput() {
         String input = userInput.getText();
-        String response = duke.getResponse(input);
+        String response = luke.getResponse(input);
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
-                DialogBox.getDukeDialog(response, dukeImage)
+                DialogBox.getLukeDialog(response, lukeImage)
         );
         userInput.clear();
 
-        if (duke.shouldExit()) {
+        if (luke.shouldExit()) {
             // Show the goodbye response for a moment before exiting
             new Thread(() -> {
                 try { Thread.sleep(250); } catch (InterruptedException ignored) {}

@@ -1,8 +1,7 @@
-package duke;
+package luke;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class TaskList {
     private final List<Task> tasks = new ArrayList<>(100);

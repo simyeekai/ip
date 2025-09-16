@@ -1,4 +1,4 @@
-package duke;
+package luke;
 
 import org.junit.jupiter.api.Test;
 
@@ -15,22 +15,22 @@ public class ParserTest {
 
     @Test
     void requireIndex_zeroOrNegative_throws() {
-        DukeException ex1 = assertThrows(DukeException.class, () -> Parser.requireIndex("0", 3));
+        LukeException ex1 = assertThrows(LukeException.class, () -> Parser.requireIndex("0", 3));
         assertTrue(ex1.getMessage().toLowerCase().contains("range"));
 
-        DukeException ex2 = assertThrows(DukeException.class, () -> Parser.requireIndex("-1", 3));
+        LukeException ex2 = assertThrows(LukeException.class, () -> Parser.requireIndex("-1", 3));
         assertTrue(ex2.getMessage().toLowerCase().contains("range"));
     }
 
     @Test
     void requireIndex_outOfBounds_throws() {
-        DukeException ex = assertThrows(DukeException.class, () -> Parser.requireIndex("10", 2));
+        LukeException ex = assertThrows(LukeException.class, () -> Parser.requireIndex("10", 2));
         assertTrue(ex.getMessage().toLowerCase().contains("range"));
     }
 
     @Test
     void requireIndex_notANumber_throws() {
-        DukeException ex = assertThrows(DukeException.class, () -> Parser.requireIndex("abc", 2));
+        LukeException ex = assertThrows(LukeException.class, () -> Parser.requireIndex("abc", 2));
         assertTrue(ex.getMessage().toLowerCase().contains("valid"));
     }
 

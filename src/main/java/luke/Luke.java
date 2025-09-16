@@ -1,8 +1,8 @@
-package duke; //ai
+package luke; //ai
 
 import java.util.List;
 
-public class Duke {
+public class Luke {
     private static final String BOT_NAME = "SimBot";
     private boolean shouldExit = false;
 
@@ -11,7 +11,7 @@ public class Duke {
     private final Storage storage;
     private final TaskList tasks;
 
-    public Duke() {
+    public Luke() {
         this.ui = new Ui(BOT_NAME);
         this.storage = new Storage();
         this.tasks = storage.load();
@@ -29,7 +29,7 @@ public class Duke {
     public String getResponse(String input) {
         try {
             if (input == null || input.trim().isEmpty()) {
-                throw new DukeException("OOPS!!! Empty command.");
+                throw new LukeException("OOPS!!! Empty command.");
             }
 
             ParsedCommand pc = Parser.parse(input.trim());
@@ -52,7 +52,7 @@ public class Duke {
                 case DEADLINE: {
                     String[] parts = Parser.splitOnce(pc.args(), "/by");
                     if (parts[0].isBlank() || parts[1].isBlank()) {
-                        throw new DukeException("OOPS!!! Deadline requires description and /by time.");
+                        throw new LukeException("OOPS!!! Deadline requires description and /by time.");
                     }
                     String desc = parts[0].trim();
                     String raw = parts[1].trim();
@@ -72,7 +72,7 @@ public class Duke {
                 case EVENT: {
                     String[] parts = Parser.splitTwo(pc.args(), "/from", "/to");
                     if (parts[0].isBlank() || parts[1].isBlank() || parts[2].isBlank()) {
-                        throw new DukeException("OOPS!!! Event requires description, /from and /to.");
+                        throw new LukeException("OOPS!!! Event requires description, /from and /to.");
                     }
                     Task e = new Event(parts[0].trim(), parts[1].trim(), parts[2].trim());
                     tasks.add(e);
@@ -117,9 +117,9 @@ public class Duke {
                     return getHelpText();
 
                 default:
-                    throw new DukeException("OOPS!! I'm sorry, but I don't know what that means :(");
+                    throw new LukeException("OOPS!! I'm sorry, but I don't know what that means :(");
             }
-        } catch (DukeException e) {
+        } catch (LukeException e) {
             return e.getMessage();
         } catch (Exception e) {
             return "OOPS!!! " + e.getMessage();

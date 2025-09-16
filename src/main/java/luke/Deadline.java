@@ -1,4 +1,4 @@
-package duke;
+package luke;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -12,7 +12,7 @@ public class Deadline extends Task {
     public Deadline(String description, LocalDate byDate) {
         super(description);
         if (byDate == null) {
-            throw new DukeException("OOPS!!! Deadline date cannot be null.");
+            throw new LukeException("OOPS!!! Deadline date cannot be null.");
         }
         this.byDate = byDate;
         this.byText = byDate.toString();
@@ -21,7 +21,7 @@ public class Deadline extends Task {
     public Deadline(String description, String byText) {
         super(description);
         if (byText == null || byText.isBlank()) {
-            throw new DukeException("OOPS!!! Deadline must have a /by value.");
+            throw new LukeException("OOPS!!! Deadline must have a /by value.");
         }
         this.byText = byText.trim();
         LocalDate parsed = null;

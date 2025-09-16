@@ -1,4 +1,4 @@
-package duke;
+package luke;
 
 public abstract class Task {
     private final String description;
@@ -6,7 +6,7 @@ public abstract class Task {
 
     protected Task(String description) {
         if (description == null || description.isBlank()) {
-            throw new DukeException("OOPS!!! The description of a task cannot be empty.");
+            throw new LukeException("OOPS!!! The description of a task cannot be empty.");
         }
         this.description = description;
         this.isDone = false;

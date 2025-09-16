@@ -1,4 +1,4 @@
-package duke;
+package luke;
 
 public class Ui {
     private final String botName;
