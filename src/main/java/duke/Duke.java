@@ -1,4 +1,4 @@
-package duke; //improve code quality
+package duke; //ai
 
 import java.util.List;
 
