@@ -134,7 +134,7 @@ public class Luke {
         }
         StringBuilder sb = new StringBuilder("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
-            sb.append("\n").append(i + 1).append(". ").append(tasks.get(i));
+            sb.append("\n").append(i + 1).append(". ").append(tasks.getZero(i));
         }
         return sb.toString();
     }

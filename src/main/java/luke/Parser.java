@@ -76,6 +76,6 @@ public class Parser {
         }
         int zero = oneBased - 1;
         assert zero >= 0 && zero < size : "calculated index out of bounds";
-        return zero;
+        return oneBased;
     }
 }
